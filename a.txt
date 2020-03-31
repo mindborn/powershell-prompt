@@ -1,0 +1,2 @@
+[31mC:\repos\mindborn\powershell-prompt[0m
+a
