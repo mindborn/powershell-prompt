@@ -1,34 +1,28 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
-class PromptMain
+class Car
 {
-    public static string escapeFGColor(int r1, int g1, int b1)
+    int fgr, fgg, fgb;
+    int bgr, bgg, bgg;
+    String text;
+}
+
+class Prompt
+{
+
+    List<Car> cars = new List<Car>();
+
+
+    public override ToString()
     {
-        return escapeColor("38;2;", r1, g1, b1);
+
     }
 
-    public static string escapeBGColor(int r1, int g1, int b1)
-    {
-        return escapeColor("48;2;", r1, g1, b1);
-    }
 
-    public static string escapeColor(string prefix, int r1, int g1, int b1)
-    {
-        StringBuilder sb = new StringBuilder(30);
-        sb.Append((char)27).Append('[');
-        sb.Append(prefix).Append(r1).Append(';').Append(g1).Append(';').Append(b1);
-        sb.Append('m');
-        return sb.ToString();
-    }
-
-    public static string resetColors()
-    {
-        return ((char)27) + "[0m";
-    }
-
-    public static void Main(string[] args)
+    public Prompt()
     {
         FileInfo file = new FileInfo(".");
         string filename = file.FullName;
@@ -53,7 +47,7 @@ class PromptMain
         parts[0] = "Drive " + parts[0];
         foreach (string part in parts)
         {
-            if (i < 5 && (r+g+b)<400)
+            if (i < 5 && (r + g + b) < 400)
             {
                 sb.Append(escapeFGColor(255, 255, 255)).Append(escapeBGColor(r, g, b)).Append(' ').Append(part).Append(' ');
             }
@@ -99,4 +93,33 @@ class PromptMain
         sb.Append(' ');
         System.Console.WriteLine(sb);
     }
+    public static string escapeFGColor(int r1, int g1, int b1)
+    {
+        return escapeColor("38;2;", r1, g1, b1);
+    }
+
+    public static string escapeBGColor(int r1, int g1, int b1)
+    {
+        return escapeColor("48;2;", r1, g1, b1);
+    }
+
+    public static string escapeColor(string prefix, int r1, int g1, int b1)
+    {
+        StringBuilder sb = new StringBuilder(30);
+        sb.Append((char)27).Append('[');
+        sb.Append(prefix).Append(r1).Append(';').Append(g1).Append(';').Append(b1);
+        sb.Append('m');
+        return sb.ToString();
+    }
+
+    public static string resetColors()
+    {
+        return ((char)27) + "[0m";
+    }
+
+    public static void Main(string[] args)
+    {
+        System.Console.WriteLine(new Prompt().ToString());
+    }
+
 }
