@@ -171,15 +171,19 @@ public class Prompt
                     if (c == '?') unt++;
                     if (c == ' ') staged++;
                 }
-                int total = a + m + d + unm + unt + staged;
+                int total = a + m + d + unm + unt;
                 // System.Console.WriteLine(a+","+m+","+d+","+u);
-                if (total == 0)
+                if (total == 0 && staged==0)
                 {
                     cars.Add(new Car(255, 255, 255, 0, 160, 0, ""));
                 }
-                else
+                if(total>0)
                 {
-                    cars.Add(new Car(255, 255, 255, 255, 0, 0, " " + total));
+                    cars.Add(new Car(255, 255, 255, 160, 0, 0, " " + total));
+                }
+                if(staged>0)
+                {
+                    cars.Add(new Car(255, 255, 255, 160, 160, 0, " " + staged));
                 }
             }
         }
