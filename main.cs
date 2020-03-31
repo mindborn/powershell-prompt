@@ -44,12 +44,14 @@ public class Prompt
         for (int i = 0; i < n; i++)
         {
             Car c = cars[i];
-            Car c2 = cars[i+1];
+            Car c2 = cars[i + 1];
             c.Fill(sb);
+
             escapeBGColor(sb, c2.bgr, c2.bgg, c2.bgb);
             escapeFGColor(sb, c.bgr, c.bgg, c.bgb);
             sb.Append(SEPARATOR);
         }
+        resetColors(sb);
         return sb.ToString();
     }
 
@@ -95,8 +97,8 @@ public class Prompt
             car.bgg = g;
             car.bgb = b;
             double y = 0.38 * r + 0.51 * g + 0.11 * b;
-            System.Console.WriteLine(y);
-            if (y < 180)
+            // System.Console.WriteLine(y);
+            if (y < 128)
             {
                 car.fgr = car.fgg = car.fgb = 255;
             }
@@ -104,6 +106,12 @@ public class Prompt
             {
                 car.fgr = car.fgg = car.fgb = 0;
             }
+
+            // car.fgr = (int)(128+y);
+            // car.fgg = (int)(128+y);
+            // car.fgb = (int)(128+y);
+
+
             r = (int)(r * 1.3);
             g = (int)(g * 1.3);
             b = (int)(b * 1.3);
@@ -114,7 +122,7 @@ public class Prompt
 
     public void BuildCondaCar()
     {
-        String condaenv = Environment.GetEnvironmentVariable("CONDA_PROMPT_MODIFIER");
+        String condaenv = Environment.GetEnvironmentVariable("CONDA_PROMPT_MODIFIER").Trim();
         if (condaenv != null && !condaenv.Equals("(base)"))
         {
             cars.Add(new Car(255, 255, 255, 50, 150, 50, condaenv));
@@ -130,25 +138,49 @@ public class Prompt
             {
                 String text = File.ReadAllText(".git\\HEAD").Trim();
                 String branch = text.Substring(text.LastIndexOf('/') + 1);
-                cars.Add(new Car(50, 50, 200, 255, 255, 255, " " + branch));
-                // var proc = new Process
-                // {
-                //     StartInfo = new ProcessStartInfo
-                //     {
-                //         FileName = "git.exe",
-                //         Arguments = "status --porcelain=v1",
-                //         UseShellExecute = false,
-                //         RedirectStandardOutput = true,
-                //         CreateNoWindow = true
-                //     }
-                // };
-                // proc.Start();
+                cars.Add(new Car(255, 255, 255, 100, 100, 100, " " + branch));
+                var proc = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "git.exe",
+                        Arguments = "status --porcelain=v1",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+                proc.Start();
 
-                // while (!proc.StandardOutput.EndOfStream)
-                // {
-                //     string line = proc.StandardOutput.ReadLine();
-                //     // do something with line
-                // }
+                int a = 0;
+                int m = 0;
+                int d = 0;
+                int unm = 0;
+                int unt = 0;
+                int staged = 0;
+
+                while (!proc.StandardOutput.EndOfStream)
+                {
+                    string line = proc.StandardOutput.ReadLine();
+                    // do something with line
+                    char c = line[1];
+                    if (c == 'A') a++;
+                    if (c == 'M') m++;
+                    if (c == 'D') d++;
+                    if (c == 'U') unm++;
+                    if (c == '?') unt++;
+                    if (c == ' ') staged++;
+                }
+                int total = a + m + d + unm + unt + staged;
+                // System.Console.WriteLine(a+","+m+","+d+","+u);
+                if (total == 0)
+                {
+                    cars.Add(new Car(255, 255, 255, 0, 255, 0, ""));
+                }
+                else
+                {
+                    cars.Add(new Car(255, 255, 255, 255, 0, 0, " " + total));
+                }
             }
         }
         catch (Exception)
