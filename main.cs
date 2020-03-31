@@ -183,7 +183,7 @@ public class Prompt
                 }
                 if(staged>0)
                 {
-                    cars.Add(new Car(255, 255, 255, 160, 160, 0, " " + staged));
+                    cars.Add(new Car(255, 255, 255, 200, 100, 0, " " + staged));
                 }
             }
         }
