@@ -138,7 +138,7 @@ public class Prompt
             {
                 String text = File.ReadAllText(".git\\HEAD").Trim();
                 String branch = text.Substring(text.LastIndexOf('/') + 1);
-                cars.Add(new Car(255, 255, 255, 100, 100, 100, " " + branch));
+                cars.Add(new Car(0, 0, 0, 255, 255, 255, " " + branch));
                 var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -173,17 +173,17 @@ public class Prompt
                 }
                 int total = a + m + d + unm + unt;
                 // System.Console.WriteLine(a+","+m+","+d+","+u);
-                if (total == 0 && staged==0)
+                if (total == 0 && staged == 0)
                 {
-                    cars.Add(new Car(255, 255, 255, 0, 160, 0, ""));
+                    cars.Add(new Car(255, 255, 255, 0, 250, 0, ""));
                 }
-                if(total>0)
+                if (total > 0)
                 {
-                    cars.Add(new Car(255, 255, 255, 160, 0, 0, " " + total));
+                    cars.Add(new Car(255, 255, 255, 250, 0, 0, " " + total));
                 }
-                if(staged>0)
+                if (staged > 0)
                 {
-                    cars.Add(new Car(255, 255, 255, 200, 100, 0, " " + staged));
+                    cars.Add(new Car(255, 255, 255, 250, 150, 0, " " + staged));
                 }
             }
         }
