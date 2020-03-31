@@ -175,7 +175,7 @@ public class Prompt
                 // System.Console.WriteLine(a+","+m+","+d+","+u);
                 if (total == 0 && staged == 0)
                 {
-                    cars.Add(new Car(255, 255, 255, 0, 250, 0, ""));
+                    cars.Add(new Car(255, 255, 255, 0, 220, 0, ""));
                 }
                 if (total > 0)
                 {
