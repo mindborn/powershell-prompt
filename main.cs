@@ -60,7 +60,7 @@ public class Prompt
     {
         // SEPARATOR = "";
         SEPARATOR = "";
-        cars.Add(new Car(255, 255, 255, 0, 0, 0, "Mindborn"));
+        cars.Add(new Car(255, 255, 255, 60, 60, 60, "Mindborn"));
         cars.Add(new Car(50, 50, 255, 255, 255, 255, ""));
         BuildCondaCar();
         BuildDirCars();
