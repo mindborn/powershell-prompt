@@ -34,8 +34,6 @@ public class Prompt
             sb.Append(' ');
         }
     }
-
-
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
@@ -60,7 +58,8 @@ public class Prompt
 
     public Prompt()
     {
-        SEPARATOR = "";
+        // SEPARATOR = "";
+        SEPARATOR = "";
         cars.Add(new Car(255, 255, 255, 0, 0, 0, "Mindborn"));
         cars.Add(new Car(50, 50, 255, 255, 255, 255, ""));
         BuildCondaCar();
@@ -69,27 +68,60 @@ public class Prompt
         cars.Add(new Car(255, 255, 255, 0, 0, 0, ""));
     }
 
+    public String LoadConfig()
+    {
+        DirectoryInfo directory = new DirectoryInfo(".");
+        while (directory != null)
+        {
+            FileInfo f = new FileInfo(directory.FullName + Path.DirectorySeparatorChar + ".CONFIG");
+            if (f.Exists)
+            {
+                return File.ReadAllText(f.FullName);
+            }
+            directory = directory.Parent;
+        }
+        return null;
+
+    }
+
+
     public void BuildDirCars()
     {
         FileInfo file = new FileInfo(".");
         string filename = file.FullName;
-        // Console.WriteLine(((char)27) + "[31m" + filename + ((char)27) + "[0m");
-        int seed = 0;
-        // foreach(char c in filename.ToCharArray()) seed += c;
         string[] parts = filename.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-        for (int x = 0; x < parts.Length && x < 2; x++)
+        int r, g, b;
+        // Console.WriteLine(((char)27) + "[31m" + filename + ((char)27) + "[0m");
+        String config = LoadConfig();
+        if (config != null)
         {
-            seed += parts[x].GetHashCode();
+            String[] cparts = config.Split(new char[] { ',' });
+            r = int.Parse(cparts[0]);
+            g = int.Parse(cparts[1]);
+            b = int.Parse(cparts[2]);
         }
+        else
+        {
+            int seed = 0;
+            // foreach(char c in filename.ToCharArray()) seed += c;
+            for (int x = 0; x < parts.Length && x < 2; x++)
+            {
+                seed += parts[x].GetHashCode();
+            }
 
-        Random random = new Random(seed);
-        int r = random.Next(1, 6) * 25;
-        int g = random.Next(1, 6) * 25;
-        int b = random.Next(1, 6) * 25;
+            Random random = new Random(seed);
+            r = random.Next(1, 6) * 25;
+            g = random.Next(1, 6) * 25;
+            b = random.Next(1, 6) * 25;
+        }
 
         parts[0] = "Drive " + parts[0];
         foreach (string part in parts)
         {
+            r = (r < 0) ? 0 : (r > 255) ? 255 : r;
+            g = (g < 0) ? 0 : (g > 255) ? 255 : g;
+            b = (b < 0) ? 0 : (b > 255) ? 255 : b;
+
             Car car = new Car();
             car.text = part;
 
@@ -97,7 +129,7 @@ public class Prompt
             car.bgg = g;
             car.bgb = b;
             double y = 0.38 * r + 0.51 * g + 0.11 * b;
-            // System.Console.WriteLine(y);
+            // System.Console.Write(y + " ");
             if (y < 128)
             {
                 car.fgr = car.fgg = car.fgb = 255;
@@ -129,14 +161,29 @@ public class Prompt
         }
     }
 
+    public DirectoryInfo FindGitFolder()
+    {
+        DirectoryInfo directory = new DirectoryInfo(".");
+        while (directory != null)
+        {
+            DirectoryInfo d = new DirectoryInfo(directory.FullName + Path.DirectorySeparatorChar + ".git");
+            if (d.Exists)
+            {
+                return d;
+            }
+            directory = directory.Parent;
+        }
+        return null;
+    }
+
     public void BuildGitCar()
     {
         try
         {
-            DirectoryInfo git = new DirectoryInfo(".git");
-            if (git.Exists)
+            DirectoryInfo git = FindGitFolder(); //new DirectoryInfo(".git");
+            if (git != null)
             {
-                String text = File.ReadAllText(".git\\HEAD").Trim();
+                String text = File.ReadAllText(git.FullName + Path.DirectorySeparatorChar + "HEAD").Trim();
                 String branch = text.Substring(text.LastIndexOf('/') + 1);
                 cars.Add(new Car(0, 0, 0, 255, 255, 255, " " + branch));
                 var proc = new Process
