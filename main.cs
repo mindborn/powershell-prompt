@@ -154,10 +154,11 @@ public class Prompt
 
     public void BuildCondaCar()
     {
-        String condaenv = Environment.GetEnvironmentVariable("CONDA_PROMPT_MODIFIER").Trim();
-        if (condaenv != null && !condaenv.Equals("(base)"))
+        string condaenv = Environment.GetEnvironmentVariable("CONDA_PROMPT_MODIFIER");
+        string ce;
+        if (condaenv != null && !(ce=condaenv.Trim()).Equals("(base)"))
         {
-            cars.Add(new Car(255, 255, 255, 50, 150, 50, condaenv));
+            cars.Add(new Car(255, 255, 255, 50, 150, 50, ce));
         }
     }
 
