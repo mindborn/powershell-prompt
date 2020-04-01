@@ -158,6 +158,7 @@ public class Prompt
         string ce;
         if (condaenv != null && !(ce=condaenv.Trim()).Equals("(base)"))
         {
+            if(ce[0]=='(') ce=ce.Substring(1,ce.Length-2);
             cars.Add(new Car(255, 255, 255, 50, 150, 50, ce));
         }
     }
