@@ -58,11 +58,11 @@ public class Prompt
 
     public Prompt()
     {
-        // SEPARATOR = "";
-        SEPARATOR = "";
+        SEPARATOR = "";
+        // SEPARATOR = "";
         cars.Add(new Car(255, 255, 255, 60, 60, 60, "Mindborn"));
         // cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
-        cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
+        cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
         BuildCondaCar();
         BuildDirCars();
         BuildGitCar();
@@ -129,8 +129,8 @@ public class Prompt
             car.bgr = r;
             car.bgg = g;
             car.bgb = b;
-            double y = 0.38 * r + 0.51 * g + 0.11 * b;
-            // System.Console.Write(y + " ");
+            double y = 0.31 * r + 0.58 * g + 0.11 * b;
+            System.Console.Write(y + " ");
             if (y < 128)
             {
                 car.fgr = car.fgg = car.fgb = 255;
