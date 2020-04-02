@@ -55,45 +55,64 @@ public class Prompt
 
     public List<Car> cars = new List<Car>();
     public String SEPARATOR = "";
+    string Path = null;
+    bool IsDirPath = false;
+    String config = null;
 
-    public Prompt()
+    public Prompt(string location)
     {
+        Path = location;
         // SEPARATOR = "";
         SEPARATOR = "";
+        try
+        {
+            FileInfo file = new FileInfo(location);
+            Path = file.FullName;
+            config = LoadConfig(Path);
+            IsDirPath = true;
+        }
+
+        catch (Exception) { }
+
         cars.Add(new Car(255, 255, 255, 60, 60, 60, "Mindborn"));
         // cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
         cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
         BuildCondaCar();
-        BuildDirCars();
-        BuildGitCar();
+        BuildDirCars(Path);
+        if (IsDirPath) BuildGitCar();
         cars.Add(new Car(255, 255, 255, 0, 0, 0, ""));
     }
 
-    public String LoadConfig()
+    public String LoadConfig(string path)
     {
-        DirectoryInfo directory = new DirectoryInfo(".");
-        while (directory != null)
+        try
         {
-            FileInfo f = new FileInfo(directory.FullName + Path.DirectorySeparatorChar + ".CONFIG");
-            if (f.Exists)
+            DirectoryInfo directory = new DirectoryInfo(path);
+            if (!directory.Exists) return null;
+            while (directory != null)
             {
-                return File.ReadAllText(f.FullName);
+                FileInfo f = new FileInfo(directory.FullName + System.IO.Path.DirectorySeparatorChar + ".CONFIG");
+                if (f.Exists)
+                {
+                    return File.ReadAllText(f.FullName);
+                }
+                directory = directory.Parent;
             }
-            directory = directory.Parent;
+        }
+        catch (Exception)
+        {
+
         }
         return null;
 
     }
 
 
-    public void BuildDirCars()
+    public void BuildDirCars(string location)
     {
-        FileInfo file = new FileInfo(".");
-        string filename = file.FullName;
-        string[] parts = filename.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] parts = Path.Split(new char[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         int r, g, b;
         // Console.WriteLine(((char)27) + "[31m" + filename + ((char)27) + "[0m");
-        String config = LoadConfig();
         if (config != null)
         {
             String[] cparts = config.Split(new char[] { ',' });
@@ -116,7 +135,7 @@ public class Prompt
             b = random.Next(1, 6) * 25;
         }
 
-        parts[0] = "Drive " + parts[0];
+        // parts[0] = "Drive " + parts[0];
         foreach (string part in parts)
         {
             r = (r < 0) ? 0 : (r > 255) ? 255 : r;
@@ -157,9 +176,9 @@ public class Prompt
     {
         string condaenv = Environment.GetEnvironmentVariable("CONDA_PROMPT_MODIFIER");
         string ce;
-        if (condaenv != null && !(ce=condaenv.Trim()).Equals("(base)"))
+        if (condaenv != null && !(ce = condaenv.Trim()).Equals("(base)"))
         {
-            if(ce[0]=='(') ce=ce.Substring(1,ce.Length-2);
+            if (ce[0] == '(') ce = ce.Substring(1, ce.Length - 2);
             cars.Add(new Car(255, 255, 255, 50, 150, 50, ce));
         }
     }
@@ -169,7 +188,7 @@ public class Prompt
         DirectoryInfo directory = new DirectoryInfo(".");
         while (directory != null)
         {
-            DirectoryInfo d = new DirectoryInfo(directory.FullName + Path.DirectorySeparatorChar + ".git");
+            DirectoryInfo d = new DirectoryInfo(directory.FullName + System.IO.Path.DirectorySeparatorChar + ".git");
             if (d.Exists)
             {
                 return d;
@@ -186,7 +205,7 @@ public class Prompt
             DirectoryInfo git = FindGitFolder(); //new DirectoryInfo(".git");
             if (git != null)
             {
-                String text = File.ReadAllText(git.FullName + Path.DirectorySeparatorChar + "HEAD").Trim();
+                String text = File.ReadAllText(git.FullName + System.IO.Path.DirectorySeparatorChar + "HEAD").Trim();
                 String branch = text.Substring(text.LastIndexOf('/') + 1);
                 cars.Add(new Car(0, 0, 0, 255, 255, 255, " " + branch));
                 var proc = new Process
@@ -267,7 +286,8 @@ public class Prompt
 
     public static void Main(string[] args)
     {
-        System.Console.WriteLine(new Prompt().ToString());
+        string location = args.Length == 0 ? "." : args[0];
+        System.Console.WriteLine(new Prompt(location).ToString());
     }
 
 }
