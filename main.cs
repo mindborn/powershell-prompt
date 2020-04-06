@@ -67,9 +67,14 @@ public class Prompt
     {
         Path = location;
         Provider = provider;
-        // SEPARATOR = "";
+        SEPARATOR = "";
+        // SEPARATOR = "";
         // SEPARATOR2 = "";
-        SEPARATOR = "";
+        // SEPARATOR = "";
+        // SEPARATOR = "";
+        // SEPARATOR = "";
+        // SEPARATOR = "";
+        // SEPARATOR = "";
         // SEPARATOR = "";
         try
         {
