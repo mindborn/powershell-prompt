@@ -34,6 +34,7 @@ public class Prompt
             sb.Append(' ');
         }
     }
+
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
@@ -48,6 +49,7 @@ public class Prompt
             escapeBGColor(sb, c2.bgr, c2.bgg, c2.bgb);
             escapeFGColor(sb, c.bgr, c.bgg, c.bgb);
             sb.Append(SEPARATOR);
+            // sb.Append(i%2==1 ? SEPARATOR : SEPARATOR2);
         }
         resetColors(sb);
         return sb.ToString();
@@ -55,15 +57,20 @@ public class Prompt
 
     public List<Car> cars = new List<Car>();
     public String SEPARATOR = "";
+    // public String SEPARATOR2 = "";
     string Path = null;
+    string Provider = null;
     bool IsDirPath = false;
     String config = null;
 
-    public Prompt(string location)
+    public Prompt(string location, string provider)
     {
         Path = location;
+        Provider = provider;
         // SEPARATOR = "";
+        // SEPARATOR2 = "";
         SEPARATOR = "";
+        // SEPARATOR = "";
         try
         {
             FileInfo file = new FileInfo(location);
@@ -75,10 +82,10 @@ public class Prompt
         catch (Exception) { }
 
         cars.Add(new Car(255, 255, 255, 60, 60, 60, "Mindborn"));
-        // cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
+        // cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
         cars.Add(new Car(30, 170, 255, 255, 255, 255, ""));
         BuildCondaCar();
-        BuildDirCars(Path);
+        BuildDirCars();
         if (IsDirPath) BuildGitCar();
         cars.Add(new Car(255, 255, 255, 0, 0, 0, ""));
     }
@@ -108,31 +115,47 @@ public class Prompt
     }
 
 
-    public void BuildDirCars(string location)
+    public void BuildDirCars()
     {
+        if (Provider != null)
+        {
+            // Random random = new Random(Provider.GetHashCode());
+            // int rp, gp, bp;
+            // HSBToRGB(random.Next(360), 100, 30, out rp, out gp, out bp);
+            // cars.Add(new Car(255, 255, 255, rp, gp, bp, Provider));
+            Path = Provider + System.IO.Path.DirectorySeparatorChar + Path;
+        }
         string[] parts = Path.Split(new char[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         int r, g, b;
-        // Console.WriteLine(((char)27) + "[31m" + filename + ((char)27) + "[0m");
+        float h, s, l;
         if (config != null)
         {
             String[] cparts = config.Split(new char[] { ',' });
             r = int.Parse(cparts[0]);
             g = int.Parse(cparts[1]);
             b = int.Parse(cparts[2]);
+            RGBToHSB(r, g, b, out h, out s, out l);
         }
         else
         {
-            int seed = 0;
+            int seed = 6677;
             // foreach(char c in filename.ToCharArray()) seed += c;
-            for (int x = 0; x < parts.Length && x < 2; x++)
+            for (int x = 0; x < parts.Length && x < 3; x++)
             {
-                seed += parts[x].GetHashCode();
+                // seed ^= parts[x].GetHashCode();
+                string p = parts[x];
+                foreach (char c in p)
+                    seed *= c;
             }
 
             Random random = new Random(seed);
-            r = random.Next(1, 6) * 25;
-            g = random.Next(1, 6) * 25;
-            b = random.Next(1, 6) * 25;
+            // r = random.Next(1, 6) * 25;
+            // g = random.Next(1, 6) * 25;
+            // b = random.Next(1, 6) * 25;
+            h = random.Next(360);
+            s = 50; //random.Next(50);
+            l = random.Next(16, 17);
+            HSBToRGB(h, s, l, out r, out g, out b);
         }
 
         // parts[0] = "Drive " + parts[0];
@@ -164,9 +187,14 @@ public class Prompt
             // car.fgb = (int)(128+y);
 
 
-            r = (int)(r * 1.3);
-            g = (int)(g * 1.3);
-            b = (int)(b * 1.3);
+            // r = (int)(r * 1.4);
+            // g = (int)(g * 1.4);
+            // b = (int)(b * 1.4);
+            //l *= 1.30f;
+            l=(float)(l+(100-l)/5.5);
+            // System.Console.Write(l+" ");
+            // h += 40;
+            HSBToRGB(h, s, l, out r, out g, out b);
 
             cars.Add(car);
         }
@@ -179,7 +207,7 @@ public class Prompt
         if (condaenv != null && !(ce = condaenv.Trim()).Equals("(base)"))
         {
             if (ce[0] == '(') ce = ce.Substring(1, ce.Length - 2);
-            cars.Add(new Car(255, 255, 255, 50, 150, 50, ce));
+            cars.Add(new Car(255, 255, 255, 50, 150, 50, " " + ce));
         }
     }
 
@@ -284,10 +312,86 @@ public class Prompt
         sb.Append((char)27).Append("[0m");
     }
 
-    public static void Main(string[] args)
+    public static void RGBToHSB(float r, float g, float b, out float h, out float s, out float l)
     {
-        string location = args.Length == 0 ? "." : args[0];
-        System.Console.WriteLine(new Prompt(location).ToString());
+        r = r / 255f;
+        g = g / 255f;
+        b = b / 255f;
+
+        float max = (r > g && r > b) ? r : (g > b) ? g : b;
+        float min = (r < g && r < b) ? r : (g < b) ? g : b;
+
+        l = (max + min) / 2.0f;
+
+        if (max == min)
+        {
+            h = s = 0.0f;
+        }
+        else
+        {
+            float d = max - min;
+            s = (l > 0.5f) ? d / (2.0f - max - min) : d / (max + min);
+
+            if (r > g && r > b)
+                h = (g - b) / d + (g < b ? 6.0f : 0.0f);
+
+            else if (g > b)
+                h = (b - r) / d + 2.0f;
+
+            else
+                h = (r - g) / d + 4.0f;
+
+            h /= 6.0f;
+        }
+
+        // float[] hsl = { h, s, l };
+        // return hsl; 
+        h = (float)Math.Round(h * 360);
+        s = (float)Math.Round(s * 100);
+        l = (float)Math.Round(l * 100);
+
+        // return [h, s, l];
     }
 
+    public static void HSBToRGB(float hue, float saturation, float brightness, out int red__, out int green, out int blue_)
+    {
+        hue = hue / 360f;
+        saturation = saturation / 100f;
+        brightness = brightness / 100f;
+        // float red, green, blue;
+
+        if (saturation == 0)
+        {
+            red__ = green = blue_ = (int)Math.Round(brightness * 255); // achromatic
+        }
+        else
+        {
+            var q = brightness < 0.5 ? brightness * (1 + saturation) : brightness + saturation - brightness * saturation;
+            var p = 2 * brightness - q;
+            red__ = (int)Math.Round(255 * hue2rgb(p, q, hue + 1f / 3));
+            green = (int)Math.Round(255 * hue2rgb(p, q, hue));
+            blue_ = (int)Math.Round(255 * hue2rgb(p, q, hue - 1f / 3));
+        }
+
+        // return Color.FromArgb((int)Math.Round(red * 255), (int)Math.Round(green * 255), (int)Math.Round(blue * 255));
+    }
+
+    public static float hue2rgb(float p, float q, float t)
+    {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1f / 6) return p + (q - p) * 6 * t;
+        if (t < 1f / 2) return q;
+        if (t < 2f / 3) return p + (q - p) * (2f / 3 - t) * 6;
+        return p;
+    }
+
+    public static void Main(string[] args)
+    {
+        string location = ".", provider = null;
+        if (args.Length >= 1) location = args[0];
+        if (args.Length >= 2) provider = args[1];
+
+        System.Console.WriteLine(new Prompt(location, provider).ToString());
+    }
 }
