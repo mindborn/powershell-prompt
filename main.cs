@@ -67,11 +67,11 @@ public class Prompt
     {
         Path = location;
         Provider = provider;
-        SEPARATOR = "";
+        // SEPARATOR = "";
         // SEPARATOR = "";
         // SEPARATOR2 = "";
         // SEPARATOR = "";
-        // SEPARATOR = "";
+        SEPARATOR = "";
         // SEPARATOR = "";
         // SEPARATOR = "";
         // SEPARATOR = "";
@@ -103,7 +103,7 @@ public class Prompt
             if (!directory.Exists) return null;
             while (directory != null)
             {
-                FileInfo f = new FileInfo(directory.FullName + System.IO.Path.DirectorySeparatorChar + ".CONFIG");
+                FileInfo f = new FileInfo(directory.FullName + System.IO.Path.DirectorySeparatorChar + "PROMPT.CONFIG");
                 if (f.Exists)
                 {
                     return File.ReadAllText(f.FullName);
