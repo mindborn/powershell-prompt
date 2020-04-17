@@ -1,7 +1,7 @@
 
 #region conda initialize
 # !! Contents within this block are managed by 'conda init' !!
-(& "C:\tools\Anaconda3\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
+(& "C:\tools\miniconda3\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
 #endregion
 
 function prompt()
@@ -11,3 +11,6 @@ function prompt()
 }
 
 [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+
+
+Get-PSDrive |  Where-Object {$_.Provider.Name -eq 'FileSystem'} | Format-Table @{Label="Drive"; Expression={$_.Name+"    "}}, @{Label="Free"; Expression={($_.Free/1GB).ToString("#.###")+" GB    "}}, @{Label="Used"; Expression={($_.Used/1GB).ToString("#.###")+" GB    "}} , @{Label="Total"; Expression={(($_.Free+$_.Used)/1GB).ToString("#.###")+" GB    "}} -AutoSize
