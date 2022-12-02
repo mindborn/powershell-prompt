@@ -133,17 +133,24 @@ public class Prompt
         string[] parts = Path.Split(new char[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         int r, g, b;
         float h, s, l;
+        int dh=0;
+        
         if (config != null)
         {
             String[] cparts = config.Split(new char[] { ',' });
             r = int.Parse(cparts[0]);
             g = int.Parse(cparts[1]);
             b = int.Parse(cparts[2]);
+            if(cparts.Length>3)
+            {
+                dh=int.Parse(cparts[3]);
+            }
             RGBToHSB(r, g, b, out h, out s, out l);
         }
         else
         {
             int seed = 6677;
+            Random random = new Random(seed);
             // foreach(char c in filename.ToCharArray()) seed += c;
             for (int x = 0; x < parts.Length && x < 3; x++)
             {
@@ -153,7 +160,7 @@ public class Prompt
                     seed *= c;
             }
 
-            Random random = new Random(seed);
+            
             // r = random.Next(1, 6) * 25;
             // g = random.Next(1, 6) * 25;
             // b = random.Next(1, 6) * 25;
@@ -164,6 +171,7 @@ public class Prompt
         }
 
         // parts[0] = "Drive " + parts[0];
+        Random randomh=new Random();
         foreach (string part in parts)
         {
             r = (r < 0) ? 0 : (r > 255) ? 255 : r;
@@ -197,6 +205,11 @@ public class Prompt
             // b = (int)(b * 1.4);
             //l *= 1.30f;
             l=(float)(l+(100-l)/5.5);
+            if(dh>0)
+            {
+                h+=randomh.Next(2*dh)-dh;
+            }
+            //s+=randomh.Next(10);
             // System.Console.Write(l+" ");
             // h += 40;
             HSBToRGB(h, s, l, out r, out g, out b);
