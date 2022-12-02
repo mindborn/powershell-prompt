@@ -83,7 +83,6 @@ public class Prompt
             config = LoadConfig(Path);
             IsDirPath = true;
         }
-
         catch (Exception) { }
 
         cars.Add(new Car(255, 255, 255, 60, 60, 60, "Mindborn"));
